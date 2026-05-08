@@ -1,4 +1,4 @@
-# Generator Monitoring IoT Platform — Backend
+# JobStream: End-to-End Job Aggregator
 
 A data engineering project that scrapes, cleans, and centralizes job postings from multiple platforms into a single, searchable dashboard.
 
