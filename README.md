@@ -15,7 +15,7 @@ project/
 │   └── forsna web scraping.py               
 │   └── naukrigulf.py               
 │   └── Tanqeeb.py               
-│   └── wuzzuf.py                     ← Simulates ESP32 without hardware
+│   └── wuzzuf.py                     
 │
 ├── templates/                        ← web pages
 ├── requirements.txt
