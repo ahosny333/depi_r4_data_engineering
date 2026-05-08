@@ -31,7 +31,7 @@ project/
 git clone https://github.com
 ```
 
-### 1. Install dependencies
+### 2. Install dependencies
 ```bash
 cd project
 python -m venv venv
@@ -39,7 +39,7 @@ source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 2. Start the backend
+### 3. Start the backend
 ```bash
 python app.py
 ```
