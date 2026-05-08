@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>OpportunityGate — Job Search Portal</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple-50:  #EEEDFE;
+      --purple-100: #CECBF6;
+      --purple-200: #AFA9EC;
+      --purple-400: #7F77DD;
+      --purple-600: #534AB7;
+      --purple-800: #3C3489;
+      --purple-900: #26215C;
+      --teal-50:  #E1F5EE;
+      --teal-600: #0F6E56;
+      --teal-800: #085041;
+      --amber-50:  #FAEEDA;
+      --amber-600: #854F0B;
+      --amber-700: #BA7517;
+      --coral-50:  #FAECE7;
+      --coral-600: #993C1D;
+      --coral-700: #D85A30;
+      --pink-50:   #FBEAF0;
+      --pink-600:  #993556;
+      --border: rgba(0,0,0,0.12);
+      --border-light: rgba(0,0,0,0.06);
+      --text: #1a1a2e;
+      --text-muted: #6b6b8a;
+      --bg: #f8f7ff;
+      --bg-card: #ffffff;
+      --radius: 10px;
+      --radius-lg: 14px;
+    }
+
+    body {
+      font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 1.5rem 1rem;
+    }
+
+    /* TOPBAR */
+    .topbar {
+      background: var(--purple-600);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-icon {
+      width: 40px; height: 40px;
+      background: var(--purple-50);
+      border-radius: var(--radius);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .brand-icon svg { width: 22px; height: 22px; }
+    .brand-title { font-size: 20px; font-weight: 600; color: var(--purple-50); letter-spacing: -0.3px; }
+    .brand-sub   { font-size: 12px; color: var(--purple-200); margin-top: 2px; }
+    .live-count  { font-size: 13px; color: var(--purple-100); }
+
+    /* SEARCH ROW */
+    .search-row {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .search-row input,
+    .search-row select {
+      flex: 1; min-width: 130px;
+      padding: 9px 12px;
+      border: 0.5px solid var(--purple-100);
+      border-radius: var(--radius);
+      background: var(--purple-50);
+      color: var(--purple-900);
+      font-size: 13px;
+      outline: none;
+      transition: border-color .15s;
+    }
+    .search-row input::placeholder { color: var(--purple-400); }
+    .search-row input:focus,
+    .search-row select:focus { border-color: var(--purple-600); }
+    .btn-search {
+      padding: 9px 22px;
+      border: none;
+      border-radius: var(--radius);
+      background: var(--purple-600);
+      color: var(--purple-50);
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; white-space: nowrap;
+      transition: background .15s;
+    }
+    .btn-search:hover { background: var(--purple-800); }
+
+    /* STATS */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px; margin-bottom: 1.25rem;
+    }
+    .stat { border-radius: var(--radius); padding: 12px 14px; text-align: center; }
+    .stat-purple { background: var(--purple-50); }
+    .stat-teal   { background: var(--teal-50); }
+    .stat-amber  { background: var(--amber-50); }
+    .stat-coral  { background: var(--coral-50); }
+    .stat .num { font-size: 22px; font-weight: 600; }
+    .stat-purple .num { color: var(--purple-800); }
+    .stat-teal   .num { color: var(--teal-600); }
+    .stat-amber  .num { color: var(--amber-600); }
+    .stat-coral  .num { color: var(--coral-600); }
+    .stat .lbl { font-size: 11px; margin-top: 3px; }
+    .stat-purple .lbl { color: var(--purple-400); }
+    .stat-teal   .lbl { color: var(--teal-600); }
+    .stat-amber  .lbl { color: var(--amber-700); }
+    .stat-coral  .lbl { color: var(--coral-700); }
+
+    /* TABLE */
+    .tbl-wrap {
+      overflow-x: auto;
+      border: 0.5px solid var(--purple-100);
+      border-radius: var(--radius-lg);
+      background: var(--bg-card);
+    }
+    table {
+      width: 100%; border-collapse: collapse;
+      font-size: 12px; min-width: 920px; table-layout: fixed;
+    }
+    col.c-title   { width: 14%; } col.c-company { width: 11%; }
+    col.c-loc     { width: 8%;  } col.c-date    { width: 9%;  }
+    col.c-type    { width: 9%;  } col.c-exp     { width: 10%; }
+    col.c-sal     { width: 9%;  } col.c-search  { width: 10%; }
+    col.c-src     { width: 9%;  } col.c-link    { width: 7%;  }
+
+    thead { background: var(--purple-50); }
+    th {
+      padding: 10px 10px;
+      text-align: left; font-weight: 600;
+      color: var(--purple-800);
+      border-bottom: 0.5px solid var(--purple-100);
+      white-space: nowrap; cursor: pointer;
+      overflow: hidden; text-overflow: ellipsis;
+      font-size: 11px; user-select: none;
+    }
+    th:hover { color: var(--purple-900); background: #e5e3fd; }
+    td {
+      padding: 10px 10px;
+      color: var(--text);
+      border-bottom: 0.5px solid var(--purple-50);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--purple-50); }
+
+    /* BADGES */
+    .badge {
+      display: inline-block; padding: 2px 9px;
+      border-radius: 20px; font-size: 11px; font-weight: 600;
+      white-space: nowrap;
+    }
+    .b-full     { background: var(--teal-50);  color: var(--teal-600); }
+    .b-part     { background: var(--amber-50); color: var(--amber-600); }
+    .b-remote   { background: var(--purple-50); color: var(--purple-600); }
+    .b-contract { background: var(--coral-50); color: var(--coral-600); }
+    .b-free     { background: var(--pink-50);  color: var(--pink-600); }
+
+    .salary { font-weight: 600; color: var(--teal-600); }
+
+    .src-tag {
+      display: inline-block; padding: 2px 9px;
+      background: var(--purple-50); border-radius: 20px;
+      font-size: 11px; color: var(--purple-600);
+    }
+    .searched-tag {
+      display: inline-block; padding: 2px 9px;
+      background: var(--amber-50); border-radius: 20px;
+      font-size: 11px; color: var(--amber-600);
+    }
+    .link-btn {
+      display: inline-block; padding: 3px 11px;
+      border: 0.5px solid var(--purple-100);
+      border-radius: var(--radius);
+      color: var(--purple-600); text-decoration: none;
+      font-size: 11px; cursor: pointer;
+      background: var(--purple-50);
+      transition: background .12s;
+    }
+    .link-btn:hover { background: var(--purple-100); color: var(--purple-900); }
+
+    /* PAGINATION */
+    .pagination {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      margin-top: 1rem; flex-wrap: wrap; gap: 8px;
+    }
+    .pg-info { font-size: 13px; color: var(--text-muted); }
+    .pg-btns { display: flex; gap: 4px; }
+    .pg-btn {
+      padding: 4px 11px;
+      border: 0.5px solid var(--purple-100);
+      border-radius: var(--radius);
+      background: var(--purple-50); color: var(--purple-600);
+      cursor: pointer; font-size: 12px;
+      transition: background .12s;
+    }
+    .pg-btn:hover { background: var(--purple-100); }
+    .pg-btn.active {
+      background: var(--purple-600); color: var(--purple-50);
+      border-color: var(--purple-600);
+    }
+
+    @media (max-width: 600px) {
+      .stats { display: none; }
+      .live-count { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="6" width="16" height="11" rx="2" stroke="#534AB7" stroke-width="1.5"/>
+          <path d="M7 6V5a3 3 0 016 0v1" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M2 11h16" stroke="#534AB7" stroke-width="1.5"/>
+          <circle cx="10" cy="11" r="1.5" fill="#534AB7"/>
+        </svg>
+      </div>
+      <div>
+        <div class="brand-title">OpportunityGate</div>
+        <div class="brand-sub">Your gateway to the job market — search, filter &amp; apply now</div>
+      </div>
+    </div>
+    <div class="live-count" id="live-count">12 jobs available</div>
+  </div>
+
+  <div class="search-row">
+    <input type="text" placeholder="Job title or company..." id="q"/>
+    <select id="type-f">
+      <option value="">All Types</option>
+      <option value="Full-Time">Full-Time</option>
+      <option value="Part-Time">Part-Time</option>
+      <option value="Remote">Remote</option>
+      <option value="Contract">Contract</option>
+      <option value="Freelance">Freelance</option>
+    </select>
+    <select id="loc-f">
+      <option value="">All Locations</option>
+      <option value="Cairo">Cairo</option>
+      <option value="Alexandria">Alexandria</option>
+      <option value="Remote">Remote</option>
+    </select>
+    <select id="src-f">
+      <option value="">All Sources</option>
+      <option value="LinkedIn">LinkedIn</option>
+      <option value="Wuzzuf">Wuzzuf</option>
+      <option value="Bayt">Bayt</option>
+      <option value="Indeed">Indeed</option>
+      <option value="naukrigulf.com">Naukrigulf</option>
+    </select>
+    <button class="btn-search" onclick="doSearch()">Search</button>
+  </div>
+
+<div class="stats">
+    <div class="stat stat-purple"><div class="num" id="s-total">12</div><div class="lbl">Total Jobs</div></div>
+    <div class="stat stat-teal">
+      <div class="num" id="s-companies">0</div>
+      <div class="lbl">Companies</div>
+    </div>
+
+    <div class="stat stat-amber">
+      <div class="num" id="s-locations">0</div>
+      <div class="lbl">Locations</div>
+    </div>
+
+    <div class="stat stat-coral">
+      <div class="num" id="s-sources">0</div>
+      <div class="lbl">Sources</div>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table>
+      <colgroup>
+        <col class="c-title"><col class="c-company"><col class="c-loc"><col class="c-date">
+        <col class="c-type"><col class="c-exp"><col class="c-sal"><col class="c-search">
+        <col class="c-src"><col class="c-link">
+      </colgroup>
+      <thead>
+        <tr>
+          <th onclick="sort('title')">Job Title</th>
+          <th onclick="sort('company')">Company Name</th>
+          <th onclick="sort('location')">Location</th>
+          <th onclick="sort('posted')">Posted Date</th>
+          <th onclick="sort('type')">Job Type</th>
+          <th onclick="sort('exp')">Experience</th>
+          <th onclick="sort('salary')">Salary</th>
+          <th onclick="sort('searched')">Searched For</th>
+          <th onclick="sort('source')">Source</th>
+          <th>Job Link</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <div class="pagination">
+    <span class="pg-info" id="pg-info">Showing 1–10 of 12</span>
+    <div class="pg-btns" id="pg-btns"></div>
+  </div>
+
+  <script>
+  const API_BASE = "http://127.0.0.1:5000/api/jobs";
+
+  const PER = 10;
+
+  let jobs = [];
+  //let filtered = [];
+
+  let sortKey = "";
+  let sortDir = "asc";
+  let page = 1;
+
+  const BADGE = {
+    "Full-Time": "b-full",
+    "Part-Time": "b-part",
+    "Remote": "b-remote",
+    "Contract": "b-contract",
+    "Freelance": "b-free"
+  };
+
+  async function fetchJobs() {
+  try {
+    const q = document.getElementById('q').value;
+    const type = document.getElementById('type-f').value;
+    const location = document.getElementById('loc-f').value;
+    const source = document.getElementById('src-f').value;
+
+    const params = new URLSearchParams({
+      q,
+      type,
+      location,
+      source,
+      page,
+      per_page: PER,
+      sort_by: sortKey,
+      sort_dir: sortDir
+    });
+
+    const response = await fetch(`${API_BASE}?${params}`);
+
+    const data = await response.json();
+
+    jobs = data.jobs || [];
+
+    renderTable(jobs);
+    renderPagination(data.total || 0);
+    renderStats(data);
+
+    populateDynamicFilters(jobs);
+
+  } catch (err) {
+    console.error(err);
+
+    document.getElementById('tbody').innerHTML = `
+      <tr>
+        <td colspan="10" style="text-align:center;color:red;padding:20px;">
+          Failed to load jobs from server
+        </td>
+      </tr>
+    `;
+  }
+}
+
+  function renderTable(data = jobs) {
+
+  const tbody = document.getElementById('tbody');
+
+  if (!data || data.length === 0) {
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="10" style="text-align:center;padding:20px;">
+          No jobs found
+        </td>
+      </tr>
+    `;
+
+    return;
+  }
+
+  tbody.innerHTML = data.map(j => `
+
+    <tr>
+
+      <td style="font-weight:600;color:#26215C">
+        ${j.Job_Title || '-'}
+      </td>
+
+      <td>
+        ${j.Company_Name || '-'}
+      </td>
+
+      <td>
+        ${j.Location || '-'}
+      </td>
+
+      <td style="color:#6b6b8a">
+        ${j.Posted_Date || '-'}
+      </td>
+
+      <td>
+        <span class="badge ${BADGE[j.Job_Type] || 'b-part'}">
+          ${j.Job_Type || 'N/A'}
+        </span>
+      </td>
+
+      <td style="color:#6b6b8a">
+        ${j.Experience_Required || '-'}
+      </td>
+
+      <td class="salary">
+        ${j.Salary || 'Not Specified'}
+      </td>
+
+      <td>
+        <span class="searched-tag">
+          ${j.Searched_For || '-'}
+        </span>
+      </td>
+
+      <td>
+        <span class="src-tag">
+          ${extractDomain(j.Source_Website)}
+        </span>
+      </td>
+
+      <td>
+        <a
+          class="link-btn"
+          href="${j.Job_Link}"
+          target="_blank"
+        >
+          View
+        </a>
+      </td>
+
+    </tr>
+
+  `).join('');
+}
+
+  function renderPagination(total) {
+    const totalPages = Math.ceil(total / PER) || 1;
+
+    const start = (page - 1) * PER + 1;
+    const end = Math.min(page * PER, total);
+
+    document.getElementById('pg-info').textContent =
+      `Showing ${start}–${end} of ${total}`;
+
+    document.getElementById('pg-btns').innerHTML =
+      Array.from({ length: totalPages }, (_, i) => `
+        <button
+          class="pg-btn ${page === i + 1 ? 'active' : ''}"
+          onclick="goPage(${i + 1})">
+          ${i + 1}
+        </button>
+      `).join('');
+  }
+
+  function renderStats(data) {
+
+    document.getElementById('s-total').textContent = data.total;
+
+    document.getElementById('s-companies').textContent =
+      data.unique_companies || 0;
+
+    document.getElementById('s-locations').textContent =
+      data.unique_locations || 0;
+
+    document.getElementById('s-sources').textContent =
+      data.unique_sources || 0;
+
+    document.getElementById('live-count').textContent =
+      `${data.total} jobs available`;
+  }
+
+  function populateDynamicFilters(jobsData) {
+
+    const locations = [...new Set(
+      jobsData
+        .map(j => j.Location)
+        .filter(Boolean)
+    )];
+
+    const sources = [...new Set(
+      jobsData
+        .map(j => extractDomain(j.Source_Website))
+        .filter(Boolean)
+    )];
+
+    const locSelect = document.getElementById('loc-f');
+    const srcSelect = document.getElementById('src-f');
+
+    if (locSelect.options.length <= 1) {
+      locations.forEach(loc => {
+        const option = document.createElement('option');
+        option.value = loc;
+        option.textContent = loc;
+        locSelect.appendChild(option);
+      });
+    }
+
+    if (srcSelect.options.length <= 1) {
+      sources.forEach(src => {
+        const option = document.createElement('option');
+        option.value = src;
+        option.textContent = src;
+        srcSelect.appendChild(option);
+      });
+    }
+  }
+
+  function extractDomain(url) {
+    try {
+      return new URL(url).hostname.replace('www.', '');
+    } catch {
+      return '-';
+    }
+  }
+
+  async function doSearch() {
+    page = 1;
+    await fetchJobs();
+  }
+
+  async function sort(k) {
+
+    const mapping = {
+      title: "Job_Title",
+      company: "Company_Name",
+      location: "Location",
+      posted: "Posted_Date",
+      type: "Job_Type",
+      exp: "Experience_Required",
+      salary: "Salary",
+      searched: "Searched_For",
+      source: "Source_Website"
+    };
+
+    const backendKey = mapping[k];
+
+    if (!backendKey) return;
+
+    if (sortKey === backendKey) {
+      sortDir = sortDir === "asc" ? "desc" : "asc";
+    } else {
+      sortDir = "asc";
+    }
+
+    sortKey = backendKey;
+
+    await fetchJobs();
+  }
+
+  async function goPage(p) {
+    page = p;
+    await fetchJobs();
+  }
+
+  document.getElementById('q')
+    .addEventListener('keyup', e => {
+      if (e.key === 'Enter') {
+        doSearch();
+      }
+    });
+
+  document.getElementById('type-f')
+    .addEventListener('change', doSearch);
+
+  document.getElementById('loc-f')
+    .addEventListener('change', doSearch);
+
+  document.getElementById('src-f')
+    .addEventListener('change', doSearch);
+
+  window.addEventListener("DOMContentLoaded", fetchJobs);
+</script>
+</body>
+</html>
